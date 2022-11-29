@@ -10,12 +10,22 @@ AWS CDK를 기반으로 이벤트 페이지를 통해 전달되는 고객 정보
 
 ### Requirements
 - [AWS CDK](https://aws.amazon.com/cdk/)
-- [Node.js 18](https://nodejs.org/)
+- [Node.js](https://nodejs.org/)
+- [Typescript](https://www.typescriptlang.org/)
+
+### Install Essential Tools
+- pre-commit
+```shell
+brew install pre-commit
+pre-commit install
+```
 
 ### Deployment
 [AWS CDK](https://aws.amazon.com/cdk/)를 사용하여 AWS 계정에 서비스를 배포합니다.
 
-```bash
+```shell
 npm install
-cdk deploy
+cdk synth
+cdk bootstrap
+cdk deploy --all
 ```
