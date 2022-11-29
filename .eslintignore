@@ -1,0 +1,6 @@
+!.github
+.eslintrc.js
+.prettierrc.js
+package.json
+package.lock
+node_modules/

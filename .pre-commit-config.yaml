@@ -1,0 +1,9 @@
+repos:
+  - repo: local
+    hooks:
+      - id: eslint
+        name: Run eslint for staged changes
+        language: system
+        pass_filenames: false
+        types_or: [javascript, jsx, ts, tsx]
+        entry: npm run lint
