@@ -1,17 +1,27 @@
-// import * as cdk from 'aws-cdk-lib';
-// import { Template } from 'aws-cdk-lib/assertions';
-// import * as FmkSdeBeAssignment from '../lib/fmk-sde-be-assignment-stack';
+import { Template } from 'aws-cdk-lib/assertions';
+import { App } from 'aws-cdk-lib';
+import {FmkSdeBeAssignmentStack} from "../lib/fmk-sde-be-assignment-stack";
 
 // example test. To run these tests, uncomment this file along with the
 // example resource in lib/fmk-sde-be-assignment-stack.ts
-test('SQS Queue Created', () => {
-//   const app = new cdk.App();
-//     // WHEN
-//   const stack = new FmkSdeBeAssignment.FmkSdeBeAssignmentStack(app, 'MyTestStack');
-//     // THEN
-//   const template = Template.fromStack(stack);
+describe('FMK Sde Be Assignment Stack', () => {
+    let app: App;
+    let stack: FmkSdeBeAssignmentStack;
+    let template: Template;
 
-//   template.hasResourceProperties('AWS::SQS::Queue', {
-//     VisibilityTimeout: 300
-//   });
+    beforeAll(() => {
+        app = new App();
+        stack = new FmkSdeBeAssignmentStack(app, 'TestStack');
+        template = Template.fromStack(stack);
+    });
+
+    it('should create lambda function', () => {
+        template.hasResourceProperties('AWS::Lambda::Function', {});
+    });
+
+    it('should create a RestApi resource', () => {
+        template.hasResourceProperties('AWS::ApiGateway::RestApi', {
+            Name: 'Participation-API-Service',
+        });
+    });
 });
