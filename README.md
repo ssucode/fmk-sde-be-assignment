@@ -31,7 +31,7 @@ TABLE_NAME=paticipants
 npm install
 cdk synth
 cdk bootstrap
-cdk deploy --all
+npm run deploy:dev
 ```
 
 ### Unit Test
@@ -39,3 +39,56 @@ cdk deploy --all
 npm run test
 ```
 ![img.png](img.png)
+
+
+### CI / CD
+```
+** AWS Secrets setting **
+AWS_ACCESS_KEY_ID : AWS IAM을 통해 발급
+AWS_SECRET_ACCESS_KEY : AWS IAM을 통해 발급
+AWS_REGION : AWS에서 REGION 확인
+```
+
+#### 개발자 샌드박스 배포
+```
+1. git clone
+2. branch checkout
+3. npm run deploy:dev 명령 실행
+```
+#### Staging 배포(main-ci-cd.yml)
+```
+1. PR merge
+2. code-test (unit test)
+4. AWS Staging 배포 (cdk bootstrap, deploy)
+```
+#### Production 배포(main-cd.yml)
+```
+1. PR merge
+2. code-test (unit test)
+4. AWS Production 배포 (cdk bootstrap, deploy)
+```
+
+### 동작 확인
+```
+1. curl을 이용하여 정상적인 동작 테스트를 합니다.
+ - End Point:
+        https://xxxxx.execute-api.ap-northeast-2.amazonaws.com/prod/participation/part2@gmail.com
+ - Row Data:
+    {
+        "Email": "part2@gmail.com",
+        "Name": "Json Kim",
+        "Mobile": "+82102345678",
+        "Agree": true
+    }
+ - Response Data:
+     {
+        "Agree": true,
+        "Mobile": "+82102345678",
+        "LastUpdatedAt": "2022-11-30T07:51:06.595Z",
+        "CreatedAt": "2022-11-30T07:50:24.354Z",
+        "Email": "part2@gmail.com",
+        "Name": "Json Kim"
+    }
+```
+
+![img_1.png](img_1.png)

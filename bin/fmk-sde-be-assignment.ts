@@ -2,20 +2,28 @@
 import 'source-map-support/register';
 import { App } from 'aws-cdk-lib';
 import { FmkSdeBeAssignmentStack } from '../lib/fmk-sde-be-assignment-stack';
+import * as dotenv from 'dotenv';
 
 const app = new App();
-new FmkSdeBeAssignmentStack(app, 'FmkSdeBeAssignmentStack', {
-  /* If you don't specify 'env', this stack will be environment-agnostic.
-   * Account/Region-dependent features and context lookups will not work,
-   * but a single synthesized template can be deployed anywhere. */
+const env = app.node.tryGetContext('config');
+if (!env) {
+  throw new Error('cdk deploy -c config=<dev|stage|prod>를 실행해 주세요');
+}
 
-  /* Uncomment the next line to specialize this stack for the AWS Account
-   * and Region that are implied by the current CLI configuration. */
-  // env: { account: process.env.CDK_DEFAULT_ACCOUNT, region: process.env.CDK_DEFAULT_REGION },
+const path = env === 'dev' ? './.env' : `./.env.${env}`;
 
-  /* Uncomment the next line if you know exactly what Account and Region you
-   * want to deploy the stack to. */
-  // env: { account: '123456789012', region: 'us-east-1' },
+const result = dotenv.config({ path });
+if (result.error) {
+  throw result.error;
+}
 
-  /* For more information, see https://docs.aws.amazon.com/cdk/latest/guide/environments.html */
-});
+let runtimeEnvironment = {};
+if (env !== 'dev') {
+  const runtimeEnvironmentOption = {
+    account: process.env.AWS_DEFAULT_ACCOUNT,
+    region: process.env.AWS_DEFAULT_REGION,
+  };
+  runtimeEnvironment = { env: runtimeEnvironmentOption };
+}
+// eslint-disable-next-line no-new
+new FmkSdeBeAssignmentStack(app, 'FmkSdeBeAssignmentStack', runtimeEnvironment);
