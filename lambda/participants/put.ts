@@ -41,6 +41,8 @@ interface Participant {
   LastUpdatedAt?: string; // 수정일
 }
 
+const tableName = process.env.TABLE_NAME || '';
+
 /**
  * HTTP 400 BadRequest 응답을 리턴합니다
  * @param event
@@ -99,7 +101,7 @@ const StatusCodeResult = (
  * @param ddb
  * @param participant
  */
-const upsert = async (ddb: DynamoDB, participant: Participant): Promise<Participant | undefined> => {
+export const upsert = async (ddb: DynamoDB, participant: Participant): Promise<Participant | undefined> => {
   const participantDto = new ParticipantDto();
   participantDto.Email = participant.Email;
   participantDto.Name = participant.Name;
@@ -126,12 +128,12 @@ const upsert = async (ddb: DynamoDB, participant: Participant): Promise<Particip
 /**
  * get DynamoDB에서 Email과 일치하는 정보를 리턴합니다.
  * @param ddb DynamoDB 인스턴스
- * @param email 검색할 Email
+ * @param participant 참여자 정보값
  */
 const get = async (ddb: DynamoDB, participant: Participant): Promise<Participant | undefined> => {
   const { Items = [] } = await ddb
     .executeStatement({
-      Statement: 'SELECT * FROM paticipants WHERE Email = ?',
+      Statement: `SELECT * FROM ${tableName} WHERE Email = ?`,
       Parameters: [{ S: participant.Email }],
     })
     .promise();
@@ -143,14 +145,14 @@ const get = async (ddb: DynamoDB, participant: Participant): Promise<Participant
 
 /**
  * Insert 처리를 합니다.
- * @param ddb
- * @param participant
+ * @param ddb DynamoDB 인스턴스
+ * @param participant 참여자 정보값
  */
 const insert = async (ddb: DynamoDB, participant: Participant): Promise<Participant | undefined> => {
   try {
     const { Items = [] } = await ddb
       .executeStatement({
-        Statement: `INSERT INTO paticipants VALUE {
+        Statement: `INSERT INTO ${tableName} VALUE {
           'Email': ?,
           'Name': ?,
           'Mobile': ?,
@@ -180,8 +182,7 @@ const insert = async (ddb: DynamoDB, participant: Participant): Promise<Particip
  * @param participant
  */
 const update = async (ddb: DynamoDB, participant: Participant): Promise<Participant | undefined> => {
-  const updateStatement =
-    'UPDATE paticipants SET Name = ?, Mobile = ?, Agree = ?, LastUpdatedAt = ? WHERE Email = ? RETURNING ALL NEW *';
+  const updateStatement = `UPDATE ${tableName} SET Name = ?, Mobile = ?, Agree = ?, LastUpdatedAt = ? WHERE Email = ? RETURNING ALL NEW *`;
 
   try {
     const { Items = [] } = await ddb
