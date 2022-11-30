@@ -150,7 +150,7 @@ const get = async (ddb: DynamoDB, participant: Participant): Promise<Participant
  */
 const insert = async (ddb: DynamoDB, participant: Participant): Promise<Participant | undefined> => {
   try {
-    const { Items = [] } = await ddb
+    await ddb
       .executeStatement({
         Statement: `INSERT INTO ${tableName} VALUE {
           'Email': ?,
@@ -169,7 +169,7 @@ const insert = async (ddb: DynamoDB, participant: Participant): Promise<Particip
       })
       .promise();
 
-    return Items.map((item: AttributeMap) => Converter.unmarshall(item) as Participant).shift();
+    return await get(ddb, participant);
   } catch (error) {
     console.error('insert error!, error: ', error);
     return undefined;
