@@ -42,6 +42,7 @@
   "dependencies": {
     "aws-cdk-lib": "2.43.1",
     "aws-sdk": "^2.1263.0",
+    "class-validator": "^0.13.2",
     "constructs": "^10.0.0",
     "source-map-support": "^0.5.21"
   }
