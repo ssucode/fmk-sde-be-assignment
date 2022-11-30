@@ -11,7 +11,7 @@ export class DynamoDbConstruct extends Construct {
     // eslint-disable-next-line no-new
     this.paticipantsTable = new Table(this, 'paticipants-table', {
       partitionKey: {
-        name: 'email',
+        name: 'Email',
         type: AttributeType.STRING,
       },
       tableName: 'paticipants',

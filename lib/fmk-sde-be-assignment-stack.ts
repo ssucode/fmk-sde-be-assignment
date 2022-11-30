@@ -5,8 +5,10 @@ import * as path from 'path';
 import * as lambda from 'aws-cdk-lib/aws-lambda';
 import * as apigateway from 'aws-cdk-lib/aws-apigateway';
 import { DynamoDbConstruct } from './dynamodb-construct';
+import { Policy, PolicyStatement } from 'aws-cdk-lib/aws-iam';
 
 export class FmkSdeBeAssignmentStack extends Stack {
+  private readonly authorizer: apigateway.IAuthorizer;
   constructor(scope: Construct, id: string, props?: StackProps) {
     super(scope, id, props);
 
@@ -24,13 +26,27 @@ export class FmkSdeBeAssignmentStack extends Stack {
       environment,
     });
 
+    // Lambda 와 DynamoDB 의 role을 추가한다.
+    participationLambdaFunction.role?.attachInlinePolicy(
+      new Policy(this, 'participation-update-policy', {
+        statements: [
+          new PolicyStatement({
+            actions: ['dynamodb:PartiQLInsert', 'dynamodb:PartiQLUpdate', 'dynamodb:PartiQLSelect'],
+            resources: [paticipantsDb.paticipantsTable.tableArn],
+          }),
+        ],
+      }),
+    );
+
     // API Gateway 를 'Participation-API-Service' 라는 이름의 REST API 리소스로 정의
     const api = new apigateway.RestApi(this, 'participation-api', {
       restApiName: 'Participation-API-Service',
     });
 
-    // API Gateway 의 /participation 경로에 구현되어 있는 participationLambdaFunction 함수 추가(테스트로 get 호출)
-    const participationApi = api.root.addResource('participation');
-    participationApi.addMethod('GET', new apigateway.LambdaIntegration(participationLambdaFunction));
+    // API Gateway 의 /participation 경로에 구현되어 있는 participationLambdaFunction 함수 추가
+    const participationApi = api.root.addResource('participation').addResource('{email}');
+    participationApi.addMethod('PUT', new apigateway.LambdaIntegration(participationLambdaFunction), {
+      authorizer: this.authorizer,
+    });
   }
 }

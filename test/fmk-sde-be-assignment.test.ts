@@ -30,7 +30,7 @@ describe('FMK Sde Be Assignment Stack', () => {
       TableName: 'paticipants',
       KeySchema: [
         {
-          AttributeName: 'email',
+          AttributeName: 'Email',
           KeyType: 'HASH',
         },
       ],
