@@ -211,8 +211,15 @@ export const handler = async (request: APIGatewayProxyEvent): Promise<APIGateway
   if (!request.body) {
     return BadRequestResult(request);
   }
+  let jsonBody = null;
+  try {
+    jsonBody = JSON.parse(request.body);
+  } catch (error) {
+    console.log('JSON parsing error:', error);
+    return BadRequestResult(request);
+  }
 
-  const payload = JSON.parse(request.body) as Participant;
+  const payload = jsonBody as Participant;
   if (email !== payload.Email) {
     return BadRequestResult(request);
   }
